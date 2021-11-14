@@ -602,3 +602,114 @@ Apart from that we have initialized three variables, namely `mint`, `from` and `
 When we have the above things, we can start calling functions in our program, which is what we will be doing in our next sub-quest.
 
 ## The SPL Token testing boilerplate
+
+Ideally, while testing this contract, we should have been able to simply use @solana/web3.js to interact with our Anchor program, but it so happens that Anchor is built off a lot of components from Serum and is thus dependent on Serum. What that also means is that, we cannot simply import and use `@solana/web3.js` until `@project-serum/serum` uses the same version of `@solana/web3.js` as anchor.
+
+So, to mimick the functions from `@solana/web3.js`, simply copy and paste the following code. Consider this code as the SPL token client boilerplate for test initialization. Paste this code right below the `describe` block we wrote in the last sub-quest.
+
+```
+const serumCmn = require("@project-serum/common");
+const TokenInstructions = require("@project-serum/serum").TokenInstructions;
+
+const TOKEN_PROGRAM_ID = new anchor.web3.PublicKey(
+  TokenInstructions.TOKEN_PROGRAM_ID.toString()
+);
+
+async function getTokenAccount(provider, addr) {
+  return await serumCmn.getTokenAccount(provider, addr);
+}
+
+async function getMintInfo(provider, mintAddr) {
+  return await serumCmn.getMintInfo(provider, mintAddr);
+}
+
+async function createMint(provider, authority) {
+  if (authority === undefined) {
+    authority = provider.wallet.publicKey;
+  }
+  const mint = anchor.web3.Keypair.generate();
+  const instructions = await createMintInstructions(
+    provider,
+    authority,
+    mint.publicKey
+  );
+
+  const tx = new anchor.web3.Transaction();
+  tx.add(...instructions);
+
+  await provider.send(tx, [mint]);
+
+  return mint.publicKey;
+}
+
+async function createMintInstructions(provider, authority, mint) {
+  let instructions = [
+    anchor.web3.SystemProgram.createAccount({
+      fromPubkey: provider.wallet.publicKey,
+      newAccountPubkey: mint,
+      space: 82,
+      lamports: await provider.connection.getMinimumBalanceForRentExemption(82),
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    TokenInstructions.initializeMint({
+      mint,
+      decimals: 0,
+      mintAuthority: authority,
+    }),
+  ];
+  return instructions;
+}
+
+async function createTokenAccount(provider, mint, owner) {
+  const vault = anchor.web3.Keypair.generate();
+  const tx = new anchor.web3.Transaction();
+  tx.add(
+    ...(await createTokenAccountInstrs(provider, vault.publicKey, mint, owner))
+  );
+  await provider.send(tx, [vault]);
+  return vault.publicKey;
+}
+
+async function createTokenAccountInstrs(
+  provider,
+  newAccountPubkey,
+  mint,
+  owner,
+  lamports
+) {
+  if (lamports === undefined) {
+    lamports = await provider.connection.getMinimumBalanceForRentExemption(165);
+  }
+  return [
+    anchor.web3.SystemProgram.createAccount({
+      fromPubkey: provider.wallet.publicKey,
+      newAccountPubkey,
+      space: 165,
+      lamports,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    TokenInstructions.initializeAccount({
+      account: newAccountPubkey,
+      mint,
+      owner,
+    }),
+  ];
+}
+```
+
+With this, your code screen should look something like:
+![image](https://user-images.githubusercontent.com/32522659/141693728-43302120-08d4-4053-8acf-37963ee0bab9.png)
+
+
+Before moving onto the next quest, notice that we are using two new packages in the above code. You can download them using the following command:
+
+```
+npm install @project-serum/common @project-serum/serum
+```
+
+Successfull installation shall lead to this kind of screen:
+
+![image](https://user-images.githubusercontent.com/32522659/141693771-d7235fd1-5007-4e3c-b569-a3c3f2df1b65.png)
+
+
+## Initializing the test state
