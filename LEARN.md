@@ -545,5 +545,60 @@ Once your program is successfully built, you'll get a screen similar to this:
 
 ![image](https://user-images.githubusercontent.com/32522659/141692572-57eaa84d-38f4-4aeb-8e18-c48b5f7b0047.png)
 
-## Testing out our contracts
+## Importing the necessary code required for testing our contract
 
+To begin testing, head over to tests/messengerapp.js and delete everything that's written there. We are going to be writing our tests from scratch. The first step would be to import the necessary libraries and constants. To do that, use the following code:
+
+```
+const anchor = require("@project-serum/anchor");
+const assert = require("assert");
+```
+
+Now, since we will be using Mocha for testing our programs, we will create the skeleton of where we will be putting our tests. So, basically, how Mocha works is that it takes describe blocks as testing blocks and within those describe blocks there are numerous tests written using the it blocks. So, use the following code to create the skeleton:
+
+```
+describe('mymoneydapp', () => {
+  const provider = anchor.Provider.local();
+  anchor.setProvider(provider);
+  const program = anchor.workspace.TokenProxy;
+
+  let mint = null;
+  let from = null;
+  let to = null;
+
+  it("Initializes test state", async () => {
+
+  });
+
+  it("Mints a token", async () => {
+
+  });
+
+  it("Transfers a token", async () => {
+
+  });
+
+  it("Burns a token", async () => {
+
+  });
+
+  it("Set new mint authority", async () => {
+
+  });
+  
+});
+```
+
+Now, your screen should look something similar to: 
+![image](https://user-images.githubusercontent.com/32522659/141692955-472ec76f-61a8-4d7b-bc0d-4e34059be0c2.png)
+
+
+The additional things that we coded there were the introduction of provider. The provider is the abstraction of a connection to the Solana network. In the test, the Anchor framework will create the provider for us based on the environment (anchor.Provider.local()).
+
+Now, the program is an abstraction that combines the Provider, idl, and the programID (which is generated when the program is built) and allows us to call RPC methods against our program.
+
+Apart from that we have initialized three variables, namely `mint`, `from` and `to` which we will use throughout our testing.
+
+When we have the above things, we can start calling functions in our program, which is what we will be doing in our next sub-quest.
+
+## The SPL Token testing boilerplate
