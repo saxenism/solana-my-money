@@ -116,9 +116,9 @@ This should result in something like:
 In this sub-quest all we would do is initialize an Anchor project and see whether everything's there and working fine or not and after move on ahead to make our own changes.
 Head over to your preferred destination for the project using your terminal and then type the following command:
 ```
-anchor init messengerapp
+anchor init mymoneydapp
 
-cd messengerapp
+cd mymoneydapp
 ``` 
 
 This would result in a screen somewhat similar to this:
@@ -149,4 +149,67 @@ The passing tests should result in the following screen:
 
 ![](img/9.png)
 
-Now, let's head over to the `programs` directory again and start making changes to create our messaging app.
+Now, let's head over to the `programs` directory and start importing some cool Rust crates provided by Anchor which will help us build our money app.
+
+## Importing the Anchor SPL Crates
+
+Head over to `programs/mymoneydapp/Cargo.toml` and under dependencies, add the two following lines:
+
+```
+anchor-spl = "0.17.0"
+spl-token = { version = "3.1.1", features = ["no-entrypoint"] }
+```
+
+Make sure that the version of the `anchor-spl` you write here, matches the version of `anchor-lang` that you had installed. It would be much more convenient for you if install the same version that we are using in the quest. After these changes, the `Cargo.toml` file would look something like this:
+
+![](img/11.png)
+
+Now that we are done adding the dependencies in the Cargo file, let's call it inside our program too. Write down the following `use` statments at the very top of your `programs/mymoneydapp/src/lib.rs` file:
+
+```
+use anchor_spl::token::{self, Burn, MintTo, SetAuthority, Transfer};
+```
+
+After this, clear all the default code that we were provided with, this would make your coding screen look something like:
+
+![](img/12.png)
+
+## Writing our first program function
+
+Head over to `programs/mymoneydapp/src/lib.rs` and clear the code written there apart from the macro declarations and crates (libraries) that we will be using. After the clearning, your coding screen should look something like the last screen of the last quest.
+
+Now let us simply define four functions that we will be using in our Solana program. The bulk of the program goes in a module under the `#[program]` macro. We'll just define them under the `pub mod mymoneydapp` and write the logic later. These four function definitions would look like this:
+```
+    pub fn proxy_transfer(ctx: Context<ProxyTransfer>, amount: u64) -> ProgramResult {
+
+    }
+    
+    pub fn proxy_mint_to(ctx: Context<ProxyMintTo>, amount: u64) -> ProgramResult {
+    
+    }
+    
+    pub fn proxy_burn(ctx: Context<ProxyBurn>, amount: u64) -> ProgramResult {
+    
+    }
+    
+    pub fn proxy_set_authority(
+        ctx: Context<ProxySetAuthority>,
+        authority_type: AuthorityType,
+        new_authority: Option<Pubkey>,
+    ) -> ProgramResult {
+    
+    }
+```
+
+Notice the use of the word `proxy` in each function name? That is because we would be doing `Cross Program Invocation` or CPI for short in this program of ours. This essentially means that we would be calling functions of other Solana programs from our program. As you might have guessed, we would be calling the functions from the `anchor_spl` programs, which is the (abstracted) Anchor implementation of the spl-programs that you can find in the Solana Rust SDK. To look at the structure and explore the `anchor_spl` programs more, visit https://github.com/project-serum/anchor/tree/v0.17.0/spl. Reading through that would also help us understand the *implementations* later on.
+
+Here `pub` means public and `fn` means function, implying that they are public functions that can be invoked from our program, ie it becomes a client-callable program function. The first argument of these functions is always `Context<T>` which consist of the solana accounts array and the program ID, which in essence is the required data to call just about any progarm on Solana. The next parameter of these functions is a `u64` or an unsigned integer named *amount*, which we will be using as our the amount of our tokens in different functions. The `ProgramResult` is the return type of both these functions, which actually is just an easier method to serve function results and/or errors.
+
+As discussed earlier, the `Context` parameter in each function is essentially a list of all the accounts that must be passed for the function to work as expected and the different structs you see in all `Contexts` such as `ProxyTransfer`, `ProxyMintTo`, etc will be defined later. 
+
+After defining the above four functions, your code should look something like this:
+
+![image](https://user-images.githubusercontent.com/32522659/141686353-c526a7d5-930f-427d-8ba2-74f2dc6d8f33.png)
+
+## Writing the logic for our functions
+
