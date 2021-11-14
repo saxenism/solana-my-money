@@ -243,3 +243,29 @@ With this, your coding screen would look something like:
 If you want to further investigate the functions that we called here, you can head over to the [official docs of the `anchor_spl` crate](https://docs.rs/anchor-spl/0.17.0/anchor_spl/index.html).
 
 ## Let's learn to serialize and deserialize
+
+You might already be familiar with the concept of enumerate or `enum` as that is a fairly language agnostic concept. However, if you are not, you can think of enums as a convenient way of naming states or conditions in your code.
+
+Coming to what is serialization and deserialization, the good news is that Anchor does all the heavy lifting in this regards and we just need to know what these terms mean. Simple. So, serialize in general means to put together some data in a standard format and conversely deserealize means to break down a monolith into a standard format of many pieces of data. In terms of Anchor programming, `AccountSerialize` macro is used when a data structure can be serialized and stored into account storage, ie in an `AccountInfo`'s mutable data slice. Similarly, `AccountDeserialize` macro is used when a data structure can be de-serialized from binary format. This macro deserializes the instance from a given slice of bytes and updates the buffer to point at the remaining bytes.
+
+Let's see the above concepts in action. Write the following code outside of the `#[program]` module:
+```
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub enum AuthorityType {
+    MintTokens,
+    FreezeAccount,
+    AccountOwner,
+    CloseAccount
+}
+```
+
+Since literally everything on the Solana blockchain should be in form of an account, the `derive` macro is used to convert this `enum` in the format of an account. `MintTokens` here would represent the authority to mint new tokens, `FreezeAccount` to freeze accounts associated with the Mint, `AccountOwner` being the owners of a token account and `CloseAccount` representing the authority to close a token account.
+
+After this, your screen would look something like:
+
+![image](https://user-images.githubusercontent.com/32522659/141687337-3ed605ca-b7d7-4d60-8af6-134e71532924.png)
+
+## A small note about Accounts on Solana:
+An account is not actually a wallet. Instead, it’s a way for the contract to persist data between calls. This includes information such as the count in our base_account, and also information about permissions on the account. Accounts pay rent in the form of lamports, and if it runs out, then the account is purged from the blockchain. Accounts with two years worth of rent attached are “rent-exempt” and can stay on the chain forever.
+
+## Defining our accounts
