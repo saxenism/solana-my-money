@@ -713,3 +713,21 @@ Successfull installation shall lead to this kind of screen:
 
 
 ## Initializing the test state
+
+Let us fill in the first `it` block which isn't exactly testing anything, but is essential as it is setting the state of `mint`, the `from` account and the `to` account that will be used throughout all the tests. Let's see how we can set the states in the first `it` block. Update the first `it` block of code as follows:
+
+```
+  it("Initializes test state", async () => {
+    mint = await createMint(provider);
+    from = await createTokenAccount(provider, mint, provider.wallet.publicKey);
+    to = await createTokenAccount(provider, mint, provider.wallet.publicKey);
+  });
+```
+
+With this, your code screen should look something like this:
+
+![image](https://user-images.githubusercontent.com/32522659/141694382-24e9af58-8377-4122-b23f-77f30a625184.png)
+
+All the functions used during the initialization have self-explanatory names, however if you want more depth of understanding and more clarity go through the boilerplate code that we copy pasted in the last quest.
+
+## Writing tests for minting and transfering of our token
