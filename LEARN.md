@@ -590,7 +590,7 @@ describe('mymoneydapp', () => {
 ```
 
 Now, your screen should look something similar to: 
-![image](https://user-images.githubusercontent.com/32522659/141692955-472ec76f-61a8-4d7b-bc0d-4e34059be0c2.png)
+![image](https://user-images.githubusercontent.com/32522659/141697347-77d96065-9811-4e8c-b59b-9476ea262ee0.png)
 
 
 The additional things that we coded there were the introduction of provider. The provider is the abstraction of a connection to the Solana network. In the test, the Anchor framework will create the provider for us based on the environment (anchor.Provider.local()).
@@ -726,7 +726,7 @@ Let us fill in the first `it` block which isn't exactly testing anything, but is
 
 With this, your code screen should look something like this:
 
-![image](https://user-images.githubusercontent.com/32522659/141694382-24e9af58-8377-4122-b23f-77f30a625184.png)
+![image](https://user-images.githubusercontent.com/32522659/141697272-71cd426e-37ac-4410-9963-37b34addd908.png)
 
 All the functions used during the initialization have self-explanatory names, however if you want more depth of understanding and more clarity go through the boilerplate code that we copy pasted in the last quest.
 
@@ -755,8 +755,7 @@ Let's now write the test to mint a token. Write the below code to update the `Mi
 What's happening in the test is pretty straight-forward. We first call the `proxyMintTo` function from our program (remember, the function names get converted to camel case from snake case when interacting through JS here) with `amount` being 1000, where `BN` stands for BigNumber and the list of accounts that we specified in the context of this function. Then, once the function has executed, we grab the tokenAccount `from` using the `getTokenAccount` function and then check it's balance which should be equal to the number of tokens we just minted and sent to the `from` address.
 
 After this, your code screen should look something like this:
-
-![image](https://user-images.githubusercontent.com/32522659/141696004-095b603e-4c46-4f35-9268-b0ea5ceb690b.png)
+![image](https://user-images.githubusercontent.com/32522659/141697297-53397b90-226f-4b24-894a-b784603b486a.png)
 
 ## Test to transfer and burn our tokens
 
