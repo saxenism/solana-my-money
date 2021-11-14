@@ -213,3 +213,33 @@ After defining the above four functions, your code should look something like th
 
 ## Writing the logic for our functions
 
+The logic of all of our functions would be very straight-forward. We would simply call the functions provided by `anchor_spl` with the correct parameters. That's it. Simple. First update your code as the following:
+```
+    pub fn proxy_transfer(ctx: Context<ProxyTransfer>, amount: u64) -> ProgramResult {
+        token::transfer(ctx.accounts.into(), amount);
+    }
+    
+    pub fn proxy_mint_to(ctx: Context<ProxyMintTo>, amount: u64) -> ProgramResult {
+        token::mint_to(ctx.accounts.into(), amount);
+    }
+    
+    pub fn proxy_burn(ctx: Context<ProxyBurn>, amount: u64) -> ProgramResult {
+        token::burn(ctx.accounts.into(), amount);
+    }
+    
+    pub fn proxy_set_authority(
+        ctx: Context<ProxySetAuthority>,
+        authority_type: AuthorityType,
+        new_authority: Option<Pubkey>,
+    ) -> ProgramResult {
+        token::set_authority(ctx.accounts.into(), authority_type.into(), new_authority);
+    }
+```
+
+With this, your coding screen would look something like: 
+
+![image](https://user-images.githubusercontent.com/32522659/141686661-65bdf7e1-44ac-4668-a8ce-962094805b63.png)
+
+If you want to further investigate the functions that we called here, you can head over to the [official docs of the `anchor_spl` crate](https://docs.rs/anchor-spl/0.17.0/anchor_spl/index.html).
+
+## Let's learn to serialize and deserialize
