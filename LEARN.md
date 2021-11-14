@@ -302,4 +302,57 @@ allowing us to more easily reason about the security of our programs.
 
 ## Defining all other accounts
 
+In a similar fashion to the `ProxyTransfer` account struct, we can define `ProxyMintTo`, `ProxyBurn` and `ProxySetAuthority` structs with the desired information (accounts) in each of them as required by their respective functions. It'll be a fun exercise for you to open up the `anchor-spl` crate in Anchor's github and try to figure out what would be structure of all the remaining account structs. 
 
+Once you have given it your best shot, comapre your structs with what we have here. Up first is the `ProxyMintTo` struct that will be used to call the `proxy_mint_to` function.
+```
+#[derive(Accounts)]
+pub struct ProxyMintTo<'info> {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub mint: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+}
+```
+This structure is pretty similar to the `ProxyTransfer` struct we defined in the last quest, right? The difference here is with the `Mint` account that is essentially the account of your token, and we would want that to be mutable since you can change supplies and so on. 
+
+Let's tackle the `ProxyBurn` struct next that will be used to call the `proxy_burn` function. That would have a structure similar to this:
+
+```
+#[derive(Accounts)]
+pub struct ProxyBurn<'info> {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub mint: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+}
+```
+
+This structure is again pretty similar to our earlier structs, right? This also requires a `mint` account so that the function could know which `token account` has to be disabled.
+
+With that let's tackle the final account struct, the `ProxySetAuthority` and as you might have guessed, it is slightly different than the rest of the structs:
+```
+#[derive(Accounts)]
+pub struct ProxySetAuthority<'info> {
+    #[account(signer)]
+    pub current_authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub account_or_mint: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+}
+```
+
+The accounts here are used to determine who the current authority is and whether that authority is the one who has signed this transaction or not and whether the new authority of the token account is going to be another account or a mint and then there's the token program again to identify the correct program call.
+
+After defining these accounts, your code screen should look something like this:
+
+![image](https://user-images.githubusercontent.com/32522659/141688706-210bde08-13e1-4cf5-a47c-e2fbf4de8f44.png)
+
+
+## Time for implementing Cross Program Invocations (CPIs)
