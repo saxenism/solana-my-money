@@ -560,7 +560,7 @@ Now, since we will be using Mocha for testing our programs, we will create the s
 describe('mymoneydapp', () => {
   const provider = anchor.Provider.local();
   anchor.setProvider(provider);
-  const program = anchor.workspace.TokenProxy;
+  const program = anchor.workspace.Mymoneydapp;
 
   let mint = null;
   let from = null;
@@ -810,3 +810,43 @@ After writing the above tests, you'll have a code screen that looks something li
 
 ## Testing the transfer of authority
 
+In this quest, let's test if we can correctly transfer the authority of our token to some other account correctly or not.
+Let's directly jump into the code to transfer the ownership of our token. Write the code below to update the `Setnew mint authority` it block:
+
+```
+  it("Set new mint authority", async () => {
+    const newMintAuthority = anchor.web3.Keypair.generate();
+    await program.rpc.proxySetAuthority(
+      { mintTokens: {} },
+      newMintAuthority.publicKey,
+      {
+        accounts: {
+          accountOrMint: mint,
+          currentAuthority: provider.wallet.publicKey,
+          tokenProgram: TokenInstructions.TOKEN_PROGRAM_ID,
+        },
+      }
+    );
+
+    const mintInfo = await getMintInfo(provider, mint);
+    assert.ok(mintInfo.mintAuthority.equals(newMintAuthority.publicKey));
+  });
+```
+
+As discussed earlier, we use the rpc handlers to call the `proxy_set_authority` function with the required list of accounts, the new authority and the authority_type which is that of mintTokens. The address for the new mint authority is generated using the web3 function called `Keypair.generate`. Later after the execution of the function, we check the mint authority of our token and it should ideally check out to be the new addresss we just generated.
+
+## Running the tests
+
+Now, that we are done running all the tests, make sure that your local validator is not running. That means make sure that the `solana-test-validator` process is not running and the `network` is set as localhost by inspecting the results of `solana config get`. Once all this is done, it is time for us to actually test the progarm that we wrote. To do that use the following command:
+
+```
+anchor test
+```
+
+If all the tests pass, you'll get a screen similar to this:
+
+![image](https://user-images.githubusercontent.com/32522659/141697082-25d461f9-638e-459b-a0b1-4b4645e3e0d7.png)
+
+If you get some errors, try debugging those using the error messages you get. Make sure you have accurately followed the code presented in the quests. You are on the same Anchor version as that followed in the quest. With that you'll find your way out of most of the errors that you might run into.
+
+Congratulations on succesfully creating your own token and testing its functioning :D 
