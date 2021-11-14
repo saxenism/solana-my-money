@@ -759,3 +759,54 @@ After this, your code screen should look something like this:
 ![image](https://user-images.githubusercontent.com/32522659/141696004-095b603e-4c46-4f35-9268-b0ea5ceb690b.png)
 
 ## Test to transfer and burn our tokens
+
+Now in this quest, let's test if we can correctly transfer our tokens and also if we can burn some of our supply or not.
+Let's directly jump into the code to transfer a token. Write the code below to update the `Transfers a token` it block:
+
+```
+  it("Transfers a token", async () => {
+    await program.rpc.proxyTransfer(new anchor.BN(400), {
+      accounts: {
+        authority: provider.wallet.publicKey,
+        to,
+        from,
+        tokenProgram: TokenInstructions.TOKEN_PROGRAM_ID,
+      },
+    });
+
+    const fromAccount = await getTokenAccount(provider, from);
+    const toAccount = await getTokenAccount(provider, to);
+
+    assert.ok(fromAccount.amount.eq(new anchor.BN(600)));
+    assert.ok(toAccount.amount.eq(new anchor.BN(400)));
+  });
+```
+
+As discussed earlier, we use the rpc handlers to call the `proxy_transfer` function with the required list of accounts and 400 as the amount from the `from` account to the `to` account. Since we minted 1000 tokens, after this transfer, the `from` account should have 600 (1000 - 400) tokens and the `to` account should have 400 tokens with them. This is exactly what we check in the test after the execution of the `proxy_transfer` function by grabbing both the accounts and then checking their balances.
+
+Now, similarly to test whether we can burn our tokens or not, write the code below and update the `Burns a token` it block.
+
+```
+  it("Burns a token", async () => {
+    await program.rpc.proxyBurn(new anchor.BN(350), {
+      accounts: {
+        authority: provider.wallet.publicKey,
+        mint,
+        to,
+        tokenProgram: TokenInstructions.TOKEN_PROGRAM_ID,
+      },
+    });
+
+    const toAccount = await getTokenAccount(provider, to);
+    assert.ok(toAccount.amount.eq(new anchor.BN(50)));
+  });
+```
+
+As discussed earlier, we use the rpc handlers to call the `proxy_transfer` function with the required list of accounts and 350 as the amount from the `to` account. Since the `to` account received 400 tokens in just the last test, if we burn 350 tokens then that account should be left with 50 tokens which is exactly what we are testing in this test.
+
+After writing the above tests, you'll have a code screen that looks something like:
+
+![image](https://user-images.githubusercontent.com/32522659/141696571-d692210e-fd65-452c-a2b5-41a4c0b51595.png)
+
+## Testing the transfer of authority
+
