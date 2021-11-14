@@ -355,4 +355,84 @@ After defining these accounts, your code screen should look something like this:
 ![image](https://user-images.githubusercontent.com/32522659/141688706-210bde08-13e1-4cf5-a47c-e2fbf4de8f44.png)
 
 
-## Time for implementing Cross Program Invocations (CPIs)
+## Say hi to Cross Program Invocations (CPIs)
+
+We did briefly talk about Cross Program Invocations, right? We don't really need to get into the details of it and a simple understanding that `CPIs` are used to invoke instructions (functions) on another program. To do so on Anchor is pretty straight-forward since it does a lot of stuff for us under the hood. All we need to is:
+1. Create a `CpiContext` object with the target instructin's accounts and program.
+2. To perform CPI, just use the `cpi` module
+3. Accounts used for CPI are not specifically denoted as such with the `CpiAccount` label since v0.15. Accounts used for CPI are not fundamentally different from `Program` or `Signer` accounts except for their role and ownership in the specific context in which they are used.
+
+So now with the above points in mind, let's create implementation blocks `impl` which we will use to create the `CpiContext`s. We will later use these `CpiContexts` to invoke instructions from other programs. Create `impl` blocks for all account structs and write the following lines of code:
+
+For `ProxyTransfer`
+```
+impl <'a, 'b, 'c, 'info> From<&mut ProxyTransfer<'info>> 
+    for CpiContext<'a, 'b, 'c, 'info, Transfer<'info>>
+{
+
+}
+```
+
+For `ProxyMintTo`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxyMintTo<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, MintTo<'info>>
+{
+
+}
+```
+
+For `ProxyBurn`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxyBurn<'info>> 
+    for CpiContext<'a, 'b, 'c, 'info, Burn<'info>> {
+
+}
+```
+
+For `ProxySetAuthority`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxySetAuthority<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, SetAuthority<'info>>
+{
+
+}
+```
+
+After writing all these, your code screen should look something like this:
+
+![image](https://user-images.githubusercontent.com/32522659/141690321-4a87b981-e327-402a-a78b-de8db72081cb.png)
+
+## Our first CPI
+
+In the last quest we created all the `impl` (implementatuon) blocks for creating the `CpiContexts` that we will now use to call the functions from the other program. 
+
+Now, let me apologise very quickly, since I hadn't been very transparent with you. Remember the strange `into` keyword we used earlier while writing our program functions without any explanation? Well, let me then introduce you to the wonders of the Rust language. The Rust language provides something called the [`From` and `Into` traits](https://doc.rust-lang.org/rust-by-example/conversion/from_into.html) which is essentially a cool way to convert `typeA` **into** `typeB`. Since we know from last quest that we require a `CpiContext` and a list of `CpiAccounts` to perform `CPI` and we also know that the functions that we had written in the very beginning are performing `CPI`, so logically we come to the conclusion that now we must write `from` implementations for those `into` that we used, so that they can be converted into the required format which is `CpiContexts` and `CpiAccounts`.
+
+So, let's see the first implementation of our `from` block that can help convert the parameters of the functions inside of our functions into `CpiContext` and `CpiAccounts`.
+Write down the below code: 
+
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxyTransfer<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, Transfer<'info>>
+{
+    fn from(accounts: &mut ProxyTransfer<'info>) -> CpiContext<'a, 'b, 'c, 'info, Transfer<'info>> {
+        let cpi_accounts = Transfer {
+            from: accounts.from.clone(),
+            to: accounts.to.clone(),
+            authority: accounts.authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+```
+
+In the above code block we first create a list of our `CpiAccounts` called `cpi_accounts`, then we reference the program that we want to call with the variable name of `cpi_program` and create the new context using `CpiContext::new`. With this implementation our first program `proxy_transfer` is completely ready for doing CPIs.
+
+Writing the above code, your code screen should look something like this:
+
+![image](https://user-images.githubusercontent.com/32522659/141691282-f6c48d94-bb64-40e7-933c-19a2f7e32725.png)
+
+
+## Implementing all other `from` blocks
