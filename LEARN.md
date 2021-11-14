@@ -436,3 +436,63 @@ Writing the above code, your code screen should look something like this:
 
 
 ## Implementing all other `from` blocks
+
+Based on how we wrote the `from` implementation block for `ProxyTransfer`, we can write the `from` implementation blocks for `ProxyMintTo`, `ProxyBurn` and `ProxySetAuthority` in a very similar fashion. A good exercise for you would be to write all these implementations yourselves.
+
+After your best attempt, match your code with the one that is provided below:
+
+For `ProxyMintTo`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxyMintTo<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, MintTo<'info>>
+{
+    fn from(accounts: &mut ProxyMintTo<'info>) -> CpiContext<'a, 'b, 'c, 'info, MintTo<'info>> {
+        let cpi_accounts = MintTo {
+            mint: accounts.mint.clone(),
+            to: accounts.to.clone(),
+            authority: accounts.authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+```
+
+For `ProxyBurn`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxyBurn<'info>> for CpiContext<'a, 'b, 'c, 'info, Burn<'info>> {
+    fn from(accounts: &mut ProxyBurn<'info>) -> CpiContext<'a, 'b, 'c, 'info, Burn<'info>> {
+        let cpi_accounts = Burn {
+            mint: accounts.mint.clone(),
+            to: accounts.to.clone(),
+            authority: accounts.authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+```
+For `ProxySetAuthority`
+```
+impl<'a, 'b, 'c, 'info> From<&mut ProxySetAuthority<'info>>
+    for CpiContext<'a, 'b, 'c, 'info, SetAuthority<'info>>
+{
+    fn from(
+        accounts: &mut ProxySetAuthority<'info>,
+    ) -> CpiContext<'a, 'b, 'c, 'info, SetAuthority<'info>> {
+        let cpi_accounts = SetAuthority {
+            account_or_mint: accounts.account_or_mint.clone(),
+            current_authority: accounts.current_authority.clone(),
+        };
+        let cpi_program = accounts.token_program.clone();
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+```
+Hope that you fared well with writing your own implementations. Now, all the `proxy` functions that we wrote earlier are ready to work perfectly, except for one fine detail. Since, the implementations are more or less identical we can move onto the next quest, where we figure out the one final piece of this token-program puzzle before it becomes complete.
+
+Now your screen should look something like:
+![image](https://user-images.githubusercontent.com/32522659/141691719-3741d4c5-87a5-47bd-bed8-1fbe8348b3ec.png)
+
+
+## The last implementation block
