@@ -216,15 +216,15 @@ After defining the above four functions, your code should look something like th
 The logic of all of our functions would be very straight-forward. We would simply call the functions provided by `anchor_spl` with the correct parameters. That's it. Simple. First update your code as the following:
 ```
     pub fn proxy_transfer(ctx: Context<ProxyTransfer>, amount: u64) -> ProgramResult {
-        token::transfer(ctx.accounts.into(), amount);
+        token::transfer(ctx.accounts.into(), amount)
     }
     
     pub fn proxy_mint_to(ctx: Context<ProxyMintTo>, amount: u64) -> ProgramResult {
-        token::mint_to(ctx.accounts.into(), amount);
+        token::mint_to(ctx.accounts.into(), amount)
     }
     
     pub fn proxy_burn(ctx: Context<ProxyBurn>, amount: u64) -> ProgramResult {
-        token::burn(ctx.accounts.into(), amount);
+        token::burn(ctx.accounts.into(), amount)
     }
     
     pub fn proxy_set_authority(
@@ -232,13 +232,14 @@ The logic of all of our functions would be very straight-forward. We would simpl
         authority_type: AuthorityType,
         new_authority: Option<Pubkey>,
     ) -> ProgramResult {
-        token::set_authority(ctx.accounts.into(), authority_type.into(), new_authority);
+        token::set_authority(ctx.accounts.into(), authority_type.into(), new_authority)
     }
 ```
 
 With this, your coding screen would look something like: 
 
-![image](https://user-images.githubusercontent.com/32522659/141686661-65bdf7e1-44ac-4668-a8ce-962094805b63.png)
+![image](https://user-images.githubusercontent.com/32522659/141692551-f5db700b-931b-4354-8382-17e920779a0d.png)
+
 
 If you want to further investigate the functions that we called here, you can head over to the [official docs of the `anchor_spl` crate](https://docs.rs/anchor-spl/0.17.0/anchor_spl/index.html).
 
@@ -496,3 +497,53 @@ Now your screen should look something like:
 
 
 ## The last implementation block
+
+Remember the quest where we talked about `enums` and `AccountSerialize` and `AccountDeserialize`? Well, you might be wondering all is good with enums being used to refer to different states with convenient names, but where exactly did we define the states? You are correct, we did not define the states and in this quest we will be doing exactly the same. We will be assigning meaning to the names within enums using the concept of [`impl` for blocks](https://doc.rust-lang.org/std/keyword.impl.html).
+
+Write the below piece of code to implement the `enum` that we defined before defining the different account structs. The below skeleton would be later on filled to `match` the enum with corresponding meaningful values.  
+
+```
+impl From<AuthorityType> for spl_token::instruction::AuthorityType {
+    fn from(authority_ty: AuthorityType) -> spl_token::instruction::AuthorityType {
+    
+    }
+}
+```
+
+This skeleton of the `impl` block is almost the same as previous blocks apart from the difference of `from` vs `for`. right? Good. Now the implementation going inside the block would be different since we are assiging values to a constant (`enum`) and not converting anything into anything. Update the above block with the following code:
+
+```
+impl From<AuthorityType> for spl_token::instruction::AuthorityType {
+    fn from(authority_ty: AuthorityType) -> spl_token::instruction::AuthorityType {
+        match authority_ty {
+            AuthorityType::MintTokens => spl_token::instruction::AuthorityType::MintTokens,
+            AuthorityType::FreezeAccount => spl_token::instruction::AuthorityType::FreezeAccount,
+            AuthorityType::AccountOwner => spl_token::instruction::AuthorityType::AccountOwner,
+            AuthorityType::CloseAccount => spl_token::instruction::AuthorityType::CloseAccount,
+        }
+    }
+}
+```
+
+The `match` keyword is used in Rust and can be thought of as a sophisticated series of if-else block. Rust provides pattern matching via the `match` keyword, which can be used like a C switch. The first matching arm is evaluated and all possible values must be covered.
+
+With this, your coding part for the Anchor program to create your own crypto-currency comes to an end with your screen looking something like:
+
+![image](https://user-images.githubusercontent.com/32522659/141692139-054cf1bb-1d70-4cb2-a2a3-a64871e842de.png)
+
+## Checking our code
+
+Before writing the tests to interact with our Anchor program, we can make sure that there are no errors in our code, by running the following command:
+
+```
+anchor build
+```
+
+If the code compiles without any error and gets built, that's good news. Our Anchor program code is working fine and we can move ahead. If you are facing some errors, re-verify that you properly followed all instructions from all the quests. Also, if you are using a different version of `anchor` make sure that there no changes in the newer version for the code that we wrote, if there are revert to `v0.17.0` or update your code accordingly.
+
+Once your program is successfully built, you'll get a screen similar to this:
+
+![image](https://user-images.githubusercontent.com/32522659/141692572-57eaa84d-38f4-4aeb-8e18-c48b5f7b0047.png)
+
+## Testing out our contracts
+
