@@ -265,7 +265,41 @@ After this, your screen would look something like:
 
 ![image](https://user-images.githubusercontent.com/32522659/141687337-3ed605ca-b7d7-4d60-8af6-134e71532924.png)
 
-## A small note about Accounts on Solana:
+### A small note about Accounts on Solana:
 An account is not actually a wallet. Instead, it’s a way for the contract to persist data between calls. This includes information such as the count in our base_account, and also information about permissions on the account. Accounts pay rent in the form of lamports, and if it runs out, then the account is purged from the blockchain. Accounts with two years worth of rent attached are “rent-exempt” and can stay on the chain forever.
 
-## Defining our accounts
+## Defining our first account struct
+
+In the first function, we used the `ProxyTransfer` struct, right? Now, let's define it so that every relevant information along with the correct constraints on those information (accounts) can be passed to our `proxy_transfer` function. Write the following lines of codes below your `Serialize` and `Deserialize` code:
+```
+#[derive(Accounts)]
+pub struct ProxyTransfer<'info> {
+    #[account(signer)]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
+    pub from: AccountInfo<'info>,
+    #[account(mut)]
+    pub to: AccountInfo<'info>,
+    pub token_program: AccountInfo<'info>,
+}
+```
+
+As discussed earlier, everything on Solana is an account, so we convert the `ProxyTransfer` struct (with all the relevant information for the `proxy_transfer` function) into an account using the `derive` account macro in the code above. The account `signer` macro you see is used to enforce the constraint that the authority is the one who signs the transaction (of calling the function) and the account `mut` macro is used to mark an account as mutable, ie, we want to persist changes in those accounts. Now coming onto the accounts themselves, these are a `from` account from which the transfer will take place and the `to` account, to which the tokens will go to. Then the `authority` is the one who should be able to execute these programs and the `token_program` is used to identify which function to call from the original crate.
+
+After this, your code screen should look something like:
+![image](https://user-images.githubusercontent.com/32522659/141687937-0c1ac5d9-06ad-4ad1-a1ff-286a42dcd244.png)
+
+### Small note about the Access Control macros
+The *Accounts* macro implements the Accounts trait. Transforms a struct from the untrusted &[AccountInfo] slice given to a Solana progam into a validated struct of deserialized account types
+
+#[account]: It is an attribute macro implementing AccountSerialize and AccountDeserialize 
+
+*Account* Wrapper type for a deserialized account implementing AccountDeserialize. Using this type within an *Accounts* struct ensures the account is owned by the address defined by *declare_id!* where the inner account was defined.
+
+With the above (and more Account Constraints and Access Controllers) we can define preconditions for our any instruction handler expecting a certain set of accounts,
+allowing us to more easily reason about the security of our programs.
+
+
+## Defining all other accounts
+
+
