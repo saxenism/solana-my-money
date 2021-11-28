@@ -64,7 +64,7 @@ solana config get
 
 This should throw up a result similar to something like: 
 
-![](img/1.png)
+![](learn_src/learn_assets/1.png)
 
 If you didnot set up your keypair earlier, then you won't be having the `Keypair Path` in your results. To set that up, follow the instructions over [here](https://docs.solana.com/wallet-guide/paper-wallet#seed-phrase-generation)
 
@@ -81,7 +81,7 @@ solana address
 
 This would result into something like this:
 
-![](img/2.png)
+![](learn_src/learn_assets/2.png)
 
 Then, for more comprehensive details of your account, use the following command with the address that you got from the last command
 ```
@@ -90,7 +90,7 @@ solana account <your address from the last command>
 
 This would result into something like this:
 
-![](img/3.png)
+![](learn_src/learn_assets/3.png)
 
 Next, we want to spin up our local network. Think of this local network as a mock Solana blockchain running on your own single system. This network would be required for development and testing of our program. To spin it up, in a separate tab, use the following command:
 ```
@@ -99,7 +99,7 @@ solana-test-validator
 
 Once you get an image, like the one below, you know that your local validator (local network) is now up and running
 
-![](img/4.png)
+![](learn_src/learn_assets/4.png)
 
 Now, our last task is to top up our account with some SOL, which you can do by using:
 
@@ -109,7 +109,7 @@ solana airdrop 100
 
 This should result in something like:
 
-![](img/5.png)
+![](learn_src/learn_assets/5.png)
 
 # Setting up our Anchor project
 
@@ -123,7 +123,7 @@ cd mymoneydapp
 
 This would result in a screen somewhat similar to this:
 
-![](img/6.png)
+![](learn_src/learn_assets/6.png)
 
 First we check whether we can see the *programs*, *app*, *programs*, *migrations* directory among others or not. If we can, we would head over to *programs/messengerapp/src/lib.rs* to see the default program that Anchor provides us. This is the most basic example possible on Anchor and what's happening here is simply that a user-defined function `Initialize` whenever called would successfully exit the program. That's all, nothing fancy. Now, let's try to compile this program using the following command:
 
@@ -133,11 +133,11 @@ anchor build
 
 This would trigger a build function and would something like this upon completion:
 
-![](img/7.png)
+![](learn_src/learn_assets/7.png)
 
 This build creates a new folder in your project directory called, `target`. This `target` folder contains the `idl` directory, which would also contain the `idl` for our program. The `IDL` or Interface Description Language describes the instructions exposed by the contract and is very similar to ABI in Solidity and user for similar purposes, ie, for tests and front-end integrations. Next, we can move onto testing this program, so that we can get familiar with how testing is done in Anchor. Head to `tests/messengerapp.js`. Here, you'll see a test written in javascript to interact and test the default program. There are a lot of things in the test, that may not make sense to you right now, but stick around and we'll get to those shortly. The test would look something like this:
 
-![](img/8.png)
+![](learn_src/learn_assets/8.png)
 
 Next, to actually run these tests, first head over to the tab where you ran the solana-test-validator command and kill that process (using Ctrl-C). Now, use the following command:
 
@@ -147,7 +147,7 @@ anchor test
 
 The passing tests should result in the following screen:
 
-![](img/9.png)
+![](learn_src/learn_assets/9.png)
 
 Now, let's head over to the `programs` directory and start importing some cool Rust crates provided by Anchor which will help us build our money app.
 
@@ -162,7 +162,7 @@ spl-token = { version = "3.1.1", features = ["no-entrypoint"] }
 
 Make sure that the version of the `anchor-spl` you write here, matches the version of `anchor-lang` that you had installed. It would be much more convenient for you if install the same version that we are using in the quest. After these changes, the `Cargo.toml` file would look something like this:
 
-![](img/11.png)
+![](learn_src/learn_assets/11.png)
 
 Now that we are done adding the dependencies in the Cargo file, let's call it inside our program too. Write down the following `use` statments at the very top of your `programs/mymoneydapp/src/lib.rs` file:
 
@@ -172,7 +172,7 @@ use anchor_spl::token::{self, Burn, MintTo, SetAuthority, Transfer};
 
 After this, clear all the default code that we were provided with, this would make your coding screen look something like:
 
-![](img/12.png)
+![](learn_src/learn_assets/12.png)
 
 ## Writing our first program function
 
