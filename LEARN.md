@@ -848,4 +848,4 @@ If all the tests pass, you'll get a screen similar to this:
 
 If you get some errors, try debugging those using the error messages you get. Make sure you have accurately followed the code presented in the quests. You are on the same Anchor version as that followed in the quest. With that you'll find your way out of most of the errors that you might run into.
 
-Congratulations on succesfully creating your own token and testing its functioning :D 
+Congratulations on succesfully creating your own token and testing its functioning. As usual, do [grab your NFT](https://alpha.layer3.xyz/task/create-your-personal-cryptocurrency-with-rust-smart-contracts)! :D 
