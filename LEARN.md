@@ -126,7 +126,7 @@ solana config set -u devnet
 ```
 Output would be
 ```bash
-Config File: <your-path>config.yml
+Config File: <your-path>/config.yml
 RPC URL: https://api.devnet.solana.com 
 WebSocket URL: wss://api.devnet.solana.com/ (computed)
 Keypair Path: <your-path>/id.json 
