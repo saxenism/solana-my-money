@@ -134,7 +134,7 @@ Commitment: confirmed
 ```
 This indicates that now your rpc is set to devnet. 
 
-Now all the commands such as `solana address` , `solana account`, `solana airdrop xxx` would functiona normally, since communication with devnet is happening in an unrestricted way.
+Now all the commands such as `solana address` , `solana account`, `solana airdrop xxx` would function normally, since communication with devnet is happening in an unrestricted way.
 
 _Please note, when using devnet you can only airdop `5` SOL at a time_
 
