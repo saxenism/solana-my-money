@@ -109,7 +109,7 @@ The output of interest is this
 ```bash
  -u, --url <URL_OR_MONIKER>   URL for Solana's JSON RPC or moniker (or their first letter):[mainnet-beta, testnet, devnet, localhost]
 ```
-We can see the -u switch enables selecting either one of the fouor options
+We can see the `-u` switch enables selecting either one of the fouor options
 
 1. **mainnet-beta** - This is solana's mainnet on which final dapps are deployed to and become available for anyone with a solana wallet to interact with.
 2. **tesnet** - To access [Solana Test Net](https://docs.solana.com/clusters#testnet) - Selecting this network can be problematic for some environments.
@@ -119,7 +119,26 @@ solana-test-validator
 ```
 4. **devnet** - To access [Solana Dev Net](https://docs.solana.com/clusters#devnet). This is the recommended network for learning/testing.
 
-After understanding the above available rpc'. It is highly recommened to choose `devnet`
+After understanding the above available rpc'. It is highly recommened to choose `devnet` for testing/learning.
+
+```bash
+solana config set -u devnet
+```
+Output would be
+```bash
+Config File: <your-path>config.yml
+RPC URL: https://api.devnet.solana.com 
+WebSocket URL: wss://api.devnet.solana.com/ (computed)
+Keypair Path: <your-path>/id.json 
+Commitment: confirmed 
+```
+This indicates that now your rpc is set to devnet. 
+
+Now all the commands such as `solana address` , `solana account`, `solana airdrop xxx` would functiona normally, since communication with devnet is happening in an unrestricted way. 
+
+_Please note, when using devnet you can only airdop `5` SOL at a time_
+
+
 
 Once you get an image, like the one below, you know that your local validator (local network) is now up and running
 
