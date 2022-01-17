@@ -96,6 +96,15 @@ Next, we want to spin up our local network. Think of this local network as a moc
 ```
 solana-test-validator
 ```
+**Alternative to localhost, testnet**
+
+In the event if `localhost`starts throwing - rpc errors, 401 or 405 errors. This would indicate there are some problems with your local environment. A quick fix is to consider using devnet. The available rpc's can be viewed with the following command
+
+```bash
+solana config set --help
+```
+
+
 
 Once you get an image, like the one below, you know that your local validator (local network) is now up and running
 
